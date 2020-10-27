@@ -28,7 +28,7 @@ class CiteParameters:
     ):
 
         self.mdFile.new_header(
-            level=4, title="All functions", style="atx", add_table_of_contents="n"
+            level=2, title="All functions", style="atx", add_table_of_contents="n"
         )
 
         all_funcs_li = [
@@ -46,7 +46,7 @@ class CiteParameters:
 
             self.mdFile.new_paragraph("******")
             self.mdFile.new_header(
-                level=4,
+                level=3,
                 title="f() - " + func_name + ":",
                 style="atx",
                 add_table_of_contents="n",
@@ -71,7 +71,7 @@ class CiteParameters:
 
     def write_aliases_section(self):
         self.mdFile.new_header(
-            level=3, title="Aliases", style="atx", add_table_of_contents="n"
+            level=2, title="Aliases", style="atx", add_table_of_contents="n"
         )
 
         mytable = ""
@@ -79,8 +79,6 @@ class CiteParameters:
         mytable += "| :------------- |:-------------:| -----:|\n"
         for myalias in self.full_alias_str_list:
             mytable += myalias  # "| **" + ppass + "** | " + pp_dict[stack] + " |\n"
-        # for fmtted_alias in self.full_alias_str_list:
-        #     self.mdFile.new_paragraph(fmtted_alias)
 
         self.mdFile.new_paragraph(mytable)
 
@@ -97,7 +95,8 @@ class CiteParameters:
             self.write_func_section()
 
         ### Process aliases
-        self.write_aliases_section()
+        if len(self.full_alias_str_list) > 0:
+            self.write_aliases_section()
 
         ### Write out .md file
         self.mdFile.create_md_file()

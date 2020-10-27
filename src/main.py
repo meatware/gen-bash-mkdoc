@@ -113,7 +113,7 @@ if __name__ == "__main__":
                         alias_comment = alias_list_lvl2[1]
 
                     alias_fmtstr = (
-                        f"| **{alias_name}** | {alias_cmd} | {alias_comment}\n"
+                        f"| **{alias_name}** | `{alias_cmd[1:-1]}` | {alias_comment}\n"
                     )
 
                     full_alias_str_list.append(alias_fmtstr)
