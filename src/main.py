@@ -8,6 +8,10 @@ import errno
 from cite_parameter import CiteParameters
 
 
+LOG = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+
+
 def mkdir_if_none(dir_name):
     """Create specified directory if it does not exist."""
 
@@ -18,8 +22,13 @@ def mkdir_if_none(dir_name):
             raise
 
 
-LOG = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+def exclude_pattern_filter(input_patt_li, test_str):
+
+    for excl_patt in input_patt_li:
+        print("*", excl_patt, test_str)
+        if excl_patt in test_str:
+            return False
+    return True
 
 
 def get_function_name(line_str):
@@ -65,11 +74,30 @@ if __name__ == "__main__":
         required=True,
     )
 
+    parser.add_argument(
+        "-x",
+        "--exclude-files",
+        dest="exclude_patterns",
+        help="FList of space seperated file path patterns to exclude",
+        type=str,
+        nargs="*",
+        default=[],
+    )
+
     args = parser.parse_args()
+
+    cleaned_infiles = [
+        infile
+        for infile in args.infiles
+        if exclude_pattern_filter(input_patt_li=args.exclude_patterns, test_str=infile)
+    ]
+
+    # print("cleaned_infiles", cleaned_infiles)
+    # sys.exit(0)
 
     out_dir = args.out_dir
     mkdir_if_none(dir_name=out_dir)
-    for infile_path in args.infiles:
+    for infile_path in cleaned_infiles:
         print(infile_path)
 
         # 1. get names of all functions in file

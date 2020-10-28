@@ -9,6 +9,7 @@ MD_SRC_DIR="gbm-docs"
 mkdocs new $PROJECT_NAME
 
 # TODO: sort out index.md (copy from REAME.md)
+mkdir -p ./${MD_SRC_DIR}/
 cp /home/bsgt/sys_bashrc/README.md ./${MD_SRC_DIR}/index.md
 
 
