@@ -4,31 +4,12 @@ import os
 import sys
 import logging
 import argparse
-import errno
 from cite_parameter import CiteParameters
+from helpers import mkdir_if_none, filter_false_if_str_in_pattern
 
 
 LOG = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-
-
-def mkdir_if_none(dir_name):
-    """Create specified directory if it does not exist."""
-
-    try:
-        os.makedirs(dir_name)
-    except OSError as err:
-        if err.errno != errno.EEXIST:
-            raise
-
-
-def exclude_pattern_filter(input_patt_li, test_str):
-
-    for excl_patt in input_patt_li:
-        print("*", excl_patt, test_str)
-        if excl_patt in test_str:
-            return False
-    return True
 
 
 def get_function_name(line_str):
@@ -89,7 +70,9 @@ if __name__ == "__main__":
     cleaned_infiles = [
         infile
         for infile in args.infiles
-        if exclude_pattern_filter(input_patt_li=args.exclude_patterns, test_str=infile)
+        if filter_false_if_str_in_pattern(
+            input_patt_li=args.exclude_patterns, test_str=infile
+        )
     ]
 
     # print("cleaned_infiles", cleaned_infiles)

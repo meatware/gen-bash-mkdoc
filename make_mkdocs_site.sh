@@ -18,7 +18,7 @@ mkdir -p ${PROJECT_NAME}/docs/
 
 cp -rf custom_assets/custom_css ${PROJECT_NAME}/docs/
 cp -rf custom_assets/custom_css ${PROJECT_NAME}/docs/
-cp -rf ${MD_SRC_DIR}/*.md ${PROJECT_NAME}/docs/
+cp -rf ${MD_SRC_DIR}/* ${PROJECT_NAME}/docs/
 
 ###########################
 cd $PROJECT_NAME/
@@ -34,21 +34,34 @@ EOF
 
 ###########################
 cd docs
-all_md_files=$(ls *.md)
+all_md_files=$(find . -name "*.md")
 cd -
 
 
-# TODO: make this not flat
-for mymd in $all_md_files; do
+echo $all_md_files
 
+##############################################
+#for mymd in $all_md_files; do
+for category_name in "aliases" "completion" "modules" "internal" "completion"; do
+cat<<BACON >> mkdocs.yml
+    - ${category_name}:
+BACON
 
-page_name=$(echo $mymd | sed 's|.sh||' | sed 's|.md||')
-echo "mymd: $page_name $mymd"
+    grouped_categ_info=$(echo "$all_md_files" | grep "$category_name" | sed 's|.md||g' | tr "/" " ")
+    grouped_categ_pages=$(echo "$all_md_files" | grep "$category_name")
 
-cat<<EOF2 >> mkdocs.yml
-    - ${page_name}: $mymd
-EOF2
-done #
+    for page_path in $grouped_categ_pages; do
+    echo "z $page_path"
+        page_name=$(echo "$page_path" | grep "$category_name" | sed 's|.md||g' | tr "/" " " | awk '{print $3}')
+        echo "mymd: $page_name $page_path"
+        #exit 1
+
+cat<<CHEESE >> mkdocs.yml
+        - ${page_name}: $page_path
+CHEESE
+        #exit 1
+    done #
+done
 
 
 ###########################

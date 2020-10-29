@@ -1,7 +1,12 @@
 """Class to extract composure cite parameters from function src code."""
 
 import sys
+import logging
 from mdutils.mdutils import MdUtils
+from helpers import mkdir_if_none, filter_false_if_str_in_pattern
+
+LOG = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 
 class CiteParameters:
@@ -152,14 +157,50 @@ class CiteParameters:
 
         self.mdFile.new_paragraph(mytable)
 
-    def main_write_md(self):
+    def organise_outfiles_2subdirs(self):
+        # probably only does one level
+        doc_cats = {
+            "aliases": "aliases",
+            "completion": "completion",
+            "modules": "modules",
+            "internal": "internal",
+            "completions": "completions",
+        }
+        cat_substrings = list(doc_cats.keys())
 
         infile_path_name = self.src_file_path.split("/")
-        outfile_path = self.out_dir + "/" + infile_path_name[-1].replace(".sh", ".md")
-        print("outfile_path", outfile_path)
+        print("infile_path_name", infile_path_name)
+
+        outfile_name = infile_path_name[-1].replace(".sh", ".md")
         # sys.exit(0)
 
-        self.mdFile = MdUtils(file_name=outfile_path, title=self.cite_about)
+        full_outfile_path = None
+        for cat in cat_substrings:
+            if cat in self.src_file_path:
+                category = doc_cats.get(cat, None)
+                outfile_path = self.out_dir + "/" + category
+                mkdir_if_none(dir_name=outfile_path)
+                full_outfile_path = outfile_path + "/" + outfile_name
+                print("full_outfile_path", full_outfile_path)
+
+                return full_outfile_path
+
+        udef_path = self.out_dir + "/" + "undef"
+        mkdir_if_none(dir_name=udef_path)
+        return udef_path + "/" + outfile_name
+
+        # sys.exit(0)
+
+    def main_write_md(self):
+
+        # infile_path_name = self.src_file_path.split("/")
+        # outfile_path = self.out_dir + "/" + infile_path_name[-1].replace(".sh", ".md")
+
+        full_outfile_path = self.organise_outfiles_2subdirs()
+        print("full_outfile_path", full_outfile_path)
+        # sys.exit(0)
+
+        self.mdFile = MdUtils(file_name=full_outfile_path, title=self.cite_about)
         self.mdFile.new_paragraph(f"***(in {self.src_file_path})***")
 
         ### Process functions
