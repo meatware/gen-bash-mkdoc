@@ -4,6 +4,7 @@ import sys
 import logging
 from mdutils.mdutils import MdUtils
 from helpers import mkdir_if_none, filter_false_if_str_in_pattern
+from function_call_tree import draw_tree, parser
 
 LOG = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
@@ -11,11 +12,18 @@ logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
 class CiteParameters:
     def __init__(
-        self, cite_about, func_text_dict, full_alias_str_list, src_file_path, out_dir
+        self,
+        cite_about,
+        func_text_dict,
+        func_dep_dict,
+        full_alias_str_list,
+        src_file_path,
+        out_dir,
     ):
 
         self.cite_about = cite_about
         self.func_text_dict = func_text_dict
+        self.func_dep_dict = func_dep_dict
         self.full_alias_str_list = full_alias_str_list
         self.src_file_path = src_file_path
         self.out_dir = out_dir
@@ -96,6 +104,24 @@ class CiteParameters:
         full_cleaned = clean4
         return full_cleaned
 
+    def gen_func_dependenct_str(self, func_name):
+
+        called_funcs = self.func_dep_dict.get(func_name, None)
+
+        if called_funcs is None:
+            return None
+
+        stringify_funccalls = func_name + ": " + " ".join(called_funcs) + "\n"
+
+        for cfunc in called_funcs:
+            if cfunc in self.func_dep_dict:
+                # make a dependent string
+                stringify_funccalls += (
+                    cfunc + ": " + " ".join(self.func_dep_dict[cfunc]) + "\n"
+                )
+        print(f"\n yo {stringify_funccalls}")
+        return stringify_funccalls
+
     def write_func_section(
         self,
     ):
@@ -119,14 +145,17 @@ class CiteParameters:
         for func_name, func_str in self.func_text_dict.items():
             # print("\n*~~~~~\n", func_name)  # , "\n", func_str)
 
+            ### Page header
             self.mdFile.new_paragraph("******")
             self.mdFile.new_header(
                 level=3,
-                title="f() - " + func_name + ":",
+                title=f"{func_name}:",
                 style="atx",
                 add_table_of_contents="n",
             )
 
+            ############################################################################
+            ### Add about, param, example, etc
             cite_li = self.gen_cite_parameter_strings(func_str=func_str)
             print("cite_li", cite_li)
             if cite_li is not None:
@@ -135,6 +164,7 @@ class CiteParameters:
                 for cparam_str in cite_li:
                     self.mdFile.new_paragraph(cparam_str)
 
+            ############################################################################
             ### Add function code block
             # for func_name, func_str in self.func_text_dict.items():
             ### 1. get func text
@@ -143,6 +173,33 @@ class CiteParameters:
             cleaned_func_str = self.clean_func_str(multiline_str=func_str)
             # print("cleaned_func_str", cleaned_func_str)
             self.mdFile.insert_code(code=cleaned_func_str, language="bash")
+
+            ############################################################################
+            ### Add function dependency block
+            multiline_funccalls_input = self.gen_func_dependenct_str(
+                func_name=func_name
+            )
+
+            self.mdFile.new_header(
+                level=4,
+                title="Function Calls:",
+                style="atx",
+                add_table_of_contents="n",
+            )
+            if multiline_funccalls_input is not None:
+                multiline_funccalls_output = draw_tree(
+                    parser(multiline_funccalls_input)
+                )
+            else:
+                multiline_funccalls_output = "No functions called."
+
+            print(
+                "\nx multiline_funccalls_output\n",
+                multiline_funccalls_output,
+                type(multiline_funccalls_output),
+            )
+            self.mdFile.insert_code(code=multiline_funccalls_output, language="bash")
+            self.mdFile.new_paragraph("\n")
 
     def write_aliases_section(self):
         self.mdFile.new_header(

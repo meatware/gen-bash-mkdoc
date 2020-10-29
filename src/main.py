@@ -135,17 +135,6 @@ if __name__ == "__main__":
                             func_text_dict[func_name] + "\n" + line
                         )
         print("\n\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        # for key, value in func_text_dict.items():
-        #     print("\n*~~~~~\n", key)  # , "\n", value)
-        citey = CiteParameters(
-            cite_about=cite_about,
-            func_text_dict=func_text_dict,
-            full_alias_str_list=full_alias_str_list,
-            src_file_path=infile_path,
-            out_dir=out_dir,
-        )
-
-        print("\n\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
         func_dep_dict = {}
         for key, value in func_text_dict.items():
             print("\n*~~~~~\n", key, "\n", value)
@@ -163,90 +152,35 @@ if __name__ == "__main__":
                 # print(line)
 
         print("\n\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        #from function_call_tree import draw_tree, parser
 
-        # ghf
-        # |-- grep_history
-        # |-- hist_nlines
-        # `-- _unique_history
-        #     |-- _add_line_numbers
-        #     |-- _chop_first_column
-        #     `-- _top_ten
+        # for func_name, called_funcs in func_dep_dict.items():
+        #     # print("\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+        #     print("\n\n")
+        #     print(func_name, len(called_funcs), called_funcs)
+        #     print("\n")
+        #     stringify_funccalls = func_name + ": " + " ".join(called_funcs) + "\n"
 
-        # def fmt_hier_string(idx, cf_len, cf_label, indent):
-        #     if idx == cf_len - 1:
-        #         return f"""{(indent+2) * " "}`-- {cf_label}\n"""
-
-        #     return f"""{(indent+2) * " "}|-- {cf_label}\n"""
-
-        # def bufferthis(fdep_list, hier_str, cf_len, indent):
-
-        #     # level = 0
-        #     for idx, cf_label in enumerate(fdep_list):
-        #         hier_str += fmt_hier_string(
-        #             idx=idx, cf_len=cf_len, cf_label=cf_label, indent=indent
-        #         )
-        #         if cf_label in func_dep_dict:
-        #             # level += 4
-        #             # for called_funcs in func_dep_dict[cf_label]:
-        #             print("yabba - found", cf_label, func_dep_dict[cf_label])
-        #             nest_hier_str = bufferthis(
-        #                 fdep_list=func_dep_dict[cf_label],
-        #                 hier_str=f"",
-        #                 cf_len=len(cf_label),
-        #                 indent=4,
+        #     for cfunc in called_funcs:
+        #         if cfunc in func_dep_dict:
+        #             # make a dependent string
+        #             stringify_funccalls += (
+        #                 cfunc + ": " + " ".join(func_dep_dict[cfunc]) + "\n"
         #             )
-        #             hier_str += nest_hier_str
-        #         # else:
-        #         #     level -= 4
-        #         # print("level", level)
-        #     return hier_str
+        #     print(f"\n{stringify_funccalls}")
 
-        # hier_frag_ascii_dict = {}
-        # for key, called_funcs in func_dep_dict.items():
-        #     print("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
-        #     print(key, len(called_funcs), called_funcs)
-        #     hier_str = f"""* {key}\n"""
+            # draw_tree(parser(stringify_funccalls))
 
-        #     ##############################
-        #     cf_len = len(called_funcs)
-        #     indent = 1
+        # sys.exit(0)
 
-        #     hier_str += bufferthis(
-        #         fdep_list=called_funcs, hier_str=hier_str, cf_len=cf_len, indent=indent
-        #     )
-
-        #     # for idx, cf_label in enumerate(called_funcs):
-        #     #     hier_str += fmt_hier_string(
-        #     #         idx=idx, cf_len=cf_len, cf_label=cf_label, indent=indent
-        #     #     )
-        #     #     if cf_label in func_dep_dict:
-        #     #         for called_funcs in func_dep_dict[cf_label]:
-        #     #         #bufferthis()
-
-        #     print("\n\n\n", hier_str)
-        #     hier_frag_ascii_dict[key] = hier_str
-        #     hier_str = ""
-
-        # print("\n\n\n\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        # for key, called_funcs in func_dep_dict.items():
-        #     print("x", key)
-        #     root_ascii = hier_frag_ascii_dict[key]
-        #     for idx, cf_label in enumerate(called_funcs):
-        #         if cf_label in hier_frag_ascii_dict:
-        #             # insert sub-ascii into root_ascii
-        #             print("boo", cf_label)
-        #             # print(hier_frag_ascii_dic+t[cf_label])
-        #             root_ascii = root_ascii.replace(
-        #                 cf_label,
-        #                 hier_frag_ascii_dict[cf_label].replace("\n", "\n" + (4 * " ")),
-        #             )
-
-        #             print(root_ascii)
-        #             sys.exit(0)
-
-        # for key, called_funcs in func_dep_dict.items():
-        #     print()
-        #     mystr = f"* {key}\n"
-        #     mystr += "\n   *".join(called_funcs)
-
-        #     print(mystr)
+        print("\n\n ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        # for key, value in func_text_dict.items():
+        #     print("\n*~~~~~\n", key)  # , "\n", value)
+        citey = CiteParameters(
+            cite_about=cite_about,
+            func_text_dict=func_text_dict,
+            func_dep_dict=func_dep_dict,
+            full_alias_str_list=full_alias_str_list,
+            src_file_path=infile_path,
+            out_dir=out_dir,
+        )
